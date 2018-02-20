@@ -179,3 +179,11 @@ class PE_File():
         op_header = self.binary_.optional_header
 
         return op_header.file_alignment
+
+    def getImageBase(self):
+        '''
+        Método para obtener la imagen base del binario
+        '''
+        op_header = self.binary_.optional_header
+
+        return op_header.imagebase

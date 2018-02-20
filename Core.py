@@ -68,6 +68,14 @@ def getBinaryFileAlignment(binary_):
     if binary_.type == 'PE_File':
         return binary_.getFileAlignment()
 
+def getBinaryImageBase(binary_):
+    '''
+    Método para obtener la imagen base según la cabecera
+    del binario
+    '''
+    if binary_.type == 'PE_File':
+        return binary_.getImageBase()
+
 '''
     Funciones para alinear valores
 '''
