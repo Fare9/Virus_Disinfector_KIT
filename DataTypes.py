@@ -162,8 +162,6 @@ class PE_File():
 
         return op_header.win32_version_value == value
 
-
-
     def getSectionAlignment(self):
         '''
         Método para obtener el section alignment del PE
@@ -187,3 +185,5 @@ class PE_File():
         op_header = self.binary_.optional_header
 
         return op_header.imagebase
+
+        

