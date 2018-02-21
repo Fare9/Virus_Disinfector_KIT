@@ -11,12 +11,15 @@ a las cabeceras y a algunas funciones interesantes
 import lief
 import os,os.path
 import sys
+import tempfile
 
 from lief import parse
 from lief import is_pe,is_elf,is_macho
 
 from DataTypes import PE_File
 from Constants import ORIGIN,CURRENT,END
+
+
 
 
 def getFileBinary(path):
@@ -152,6 +155,49 @@ def checkBinarySign(binary_,sign):
     if binary_.type == 'PE_File':
         return binary_.checkSign(sign)
 
+def putOutPegote(binary_,rva,size):
+    '''
+    Método para quitar de un archivo el tamaño indicado por
+    size a partir del RVA dado
+    '''
+    f = tempfile.NamedTemporaryFile(delete=False)
+
+    file_size = binary_.file_size
+
+    from_ = binary_.get_offset_from_rva(rva)
+
+    to_ = binary_.get_offset_from_rva(rva+size)
+
+    RVA_Seek(binary_,0,ORIGIN)
+
+    for i in range(file_size):
+
+        if (i>= from_) and (i<to_):
+            byte = RVA_Read(binary_,1)
+            continue
+
+        byte = RVA_Read(binary_,1)
+
+        f.write(chr(byte))
+
+    killBinary(binary_) # paramos el handle
+
+    f.close()
+
+    os.remove(binary_.path)
+
+    os.rename(f.name,binary_.path)
+
+    binary_.start_binary()
+
+    binary_.start_handle()
+
+def cleanSign(binary_):
+    '''
+    Método para quitar la firma de un virus del campo de la cabecera
+    win32_version_value
+    '''
+    binary_.cleanSign()
 '''
     Función para acabar con el objeto
 '''
@@ -160,5 +206,4 @@ def killBinary(binary_):
     Método para finalizar el binario
     '''
     binary_.stop_handle()
-
 

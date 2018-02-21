@@ -29,6 +29,7 @@ class PE_File():
     '''
     def __init__(self,path):
         self.path = path
+        self.file_size = os.path.getsize(self.path)
         self.handle = None
         self.binary_ = None
         self.type = 'PE_File'
@@ -58,6 +59,14 @@ class PE_File():
         con todo
         '''
         self.handle.close()
+
+    def get_offset_from_rva(self,rva):
+        '''
+        Método para obtener el offset del archivo, 
+        según un RVA
+        '''
+        offset = self.binary_.rva_to_offset(rva)
+        return offset
 
     def move_file_rva(self,rva,seek_type):
         '''
@@ -161,6 +170,25 @@ class PE_File():
         op_header = self.binary_.optional_header
 
         return op_header.win32_version_value == value
+
+    def cleanSign(self):
+        '''
+        Método para quitar la firma de un virus, y dejar
+        el win32_version_value a 0
+        '''
+        pointer_position = self.handle.tell()
+
+        self.stop_handle()
+
+        op_header = self.binary_.optional_header
+
+        op_header.win32_version_value = 0
+
+        self.binary_.write(self.path)
+
+        self.start_handle()
+
+        self.handle.seek(pointer_position,ORIGIN)
 
     def getSectionAlignment(self):
         '''
