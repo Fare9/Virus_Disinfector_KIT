@@ -17,3 +17,9 @@ END     = 2
 # Constantes para alinear el archivo
 SECTION_ALIGNMENT	= 0
 FILE_ALIGNMENT		= 1
+
+# Constantes para designar si ha habido cambios
+# o si se ha desinfectado, o si es otro virus
+MUTATION			= -1
+NOVIRUS				= -2
+CLEANED				=  0
