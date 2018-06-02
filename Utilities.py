@@ -15,5 +15,8 @@ def swapBytes(number):
 	y vice versa.
 
 	THANKS TO: @MZ_IAT
+
+	:param int number: número a pasar al otro endian.
+	:return: número pasado como parámetro en diferente endian.
 	'''
 	return unpack('>L',pack("<L",number))[0]
