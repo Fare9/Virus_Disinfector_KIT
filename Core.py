@@ -1,12 +1,15 @@
 #-*- coding: utf-8 -*-
 
 '''
-CORE de las librerías en python para realizar desinfectores de archivos
-se escribirá con la librería lief, así se podrá acceder de forma sencilla
-a las cabeceras y a algunas funciones interesantes
+CORE of python libraries to do file disinfectors, we will use lief library
+so will be easy to access headers and some interesting functions
 
+
+@file: Core.py
+@version: 0.1
 @author: Fare9
 '''
+
 
 import lief
 import os,os.path
@@ -16,9 +19,9 @@ import tempfile
 from lief import parse
 from lief import is_pe,is_elf,is_macho
 
-from DataTypes import PE_File
-from Constants import ORIGIN,CURRENT,END
-from Constants import SECTION_ALIGNMENT,FILE_ALIGNMENT
+from FileTypes.PEType import PE_File
+from Utils.Constants import ORIGIN,CURRENT,END
+from Utils.Constants import SECTION_ALIGNMENT,FILE_ALIGNMENT
 
 
 
@@ -31,7 +34,7 @@ def getFileBinary(path):
         if is_pe(path):
             return PE_File(path)
         else:
-            raise Exception('ERROR happens at getFileBinary in Core.py. This is not a valid type of file')
+            raise Exception('ERROR happened at getFileBinary in Core.py. This is not a valid type of file')
         '''
         TO_DO
         elif is_elf(path):
@@ -40,5 +43,5 @@ def getFileBinary(path):
             return MACHO_File(path)
         '''
     else:
-        raise Exception('ERROR happens at getFileBinary in Core.py. This is not a valid path')
+        raise Exception('ERROR happened at getFileBinary in Core.py. This is not a valid path')
 

@@ -1,11 +1,15 @@
 #-*- coding: utf-8 -*-
 
 '''
-Tipos de archivos soportados, estos tendrán clases
-para manejar handles y tipos binarios de lief
+Class for PE files, here we have methods to do
+the disinfection process.
 
+
+@file: PEType.py
+@version: 0.1
 @author: Fare9
 '''
+
 
 import lief
 import os,os.path
@@ -21,17 +25,16 @@ from Constants import SECTION_ALIGNMENT,FILE_ALIGNMENT
 
 class PE_File():
     '''
-    Clase para manejar los archivos del tipo PE, 
-    estos contendrán un handle para poder usarlo 
-    como archivo de apertura/escritura/lectura/cierre
-    y además contendrán un objeto de tipo binary
-    de la librería lief
+    Class to manage PE file type,
+    these will have handle to use as a file for open it,
+    write on it, read from it, close it. And it will have
+    binary type from lief library
     '''
     def __init__(self,path):
         '''
-        Constructor de la clase, arranca las variables
+        Class constructor, start variables
 
-        :param str path: ruta hacia el archivo
+        :param str path: path to file
         '''
         self.path = path
         self.file_size = os.path.getsize(self.path)
@@ -42,11 +45,10 @@ class PE_File():
         self._start_binary()
         self._start_handle()
 
-    # métodos privados
+    # private methods
     def _start_binary(self):
         '''
-        Método para arrancar el binario de lief con el path ofrecido
-        para el objeto.
+        Method to start lief binary with parameter path for the object
 
         :return: None
         '''
@@ -54,19 +56,18 @@ class PE_File():
 
     def _start_handle(self):
         '''
-        Método para arrancar el handle del archivo.
+        Method to start file handle
 
         :return: None
         '''
         try:
             self.handle = open(self.path,'r+b')
         except Exception as e:
-            raise type(e)(e.message + ' happens at _start_handle in Core.py')
+            raise type(e)(e.message + ' happened at _start_handle in PEType.py')
 
     def _stop_handle(self):
         '''
-        Método para finalizar el handle, y acabar
-        con todo.
+        Method to close the file handle.
 
         :return: None
         '''
@@ -74,10 +75,9 @@ class PE_File():
 
     def _saveChanges(self):
         '''
-        Método para grabar los cambios con lief, es necesario
-        recoger el pointer del archivo abierto, cerrarlo,
-        guardar el archivo y finalmente abrir y establecer
-        el puntero
+        Method to save lief changes, it is necessary get 
+        the opened file pointer, close it, save file with lief
+        and finally re-open it and restablish pointer.
 
         :return: None
         '''
@@ -93,57 +93,56 @@ class PE_File():
 
     def _move_file_rva(self,rva,seek_type):
         '''
-        Método para mover el puntero del archivo,
-        para moverlo tomaremos un RVA del archivo
-        en memoria, y haremos un seek desde el sitio
-        dado por el usuario
+        Method to move file pointer, to move it 
+        we will take a file RVA in memory, and then
+        we will do a seek from the starting point
+        given by user
 
-        :param int rva: rva a moverse por el archivo físico,
-                        en realidad por debajo usará el offset
-        :param int seek_type: valor que establece desde donde moverse
-                              este sólo puede ser: ORIGIN,CURRENT y END
+        :param int rva: rva to move on physical file,
+                        we use the offset beneath
+        :param int seek_type: value that say from where to move
+                              it can be only: ORIGIN,CURRENT y END
         :return: None
         '''
         try:
             offset_to_move = self.binary_.rva_to_offset(rva)
             self.handle.seek(offset_to_move,seek_type)
         except Exception as e:
-            raise type(e)(e.message + ' happens at _move_file_rva in DataTypes.py')
+            raise type(e)(e.message + ' happened at _move_file_rva in PEType.py')
 
     def _read_file_rva(self,number_of_bytes):
         '''
-        Método para leer del archivo. Antes se ha 
-        podido mover a través de _move_file_rva
+        Method to read the file. File could have moved before
+        using _move_file_rva
 
-        :param int number_of_bytes: Número de bytes a leer
-        :return: buffer con los bytes leídos en hexadecimal
+        :param int number_of_bytes: Number of bytes to read
+        :return: buffer with bytes read in hex
         '''
         try:
             buffer_ = self.handle.read(number_of_bytes)
             buffer_ = int(binascii.hexlify(buffer_),16)
             return buffer_
         except Exception as e:
-            raise type(e)(e.message + ' happens at _read_file_rva in DataTypes.py')
+            raise type(e)(e.message + ' happened at _read_file_rva in PEType.py')
 
     def _write_file_rva(self,buffer_):
         '''
-        Método para escribir en el archivo. Antes se ha
-        podido mover, a través de _move_file_rva
+        Method to write in the file. It could have moved
+        using _move_file_rva
 
-        :param chr buffer_: byte a escribir en el archivo
+        :param chr buffer_: byte to write at file 
         :return: None
         '''
         try:
             self.handle.write(buffer_)
         except Exception as e:
-            raise type(e)(e.message + ' happens at _write_file_rva in DataTypes.py')
+            raise type(e)(e.message + ' happened at _write_file_rva in PEType.py')
 
     def _truncate_file(self,size):
         '''
-        Método para truncar un archivo, con o sin un
-        size especificado
+        Method to truncate file, with or without specified size
 
-        :param_optional int size: tamaño a truncar del archivo (opcional)
+        :param_optional int size: size of file to truncate (optional)
         :return: None
         '''
         try:
@@ -152,13 +151,12 @@ class PE_File():
             else:
                 self.handle.truncate()
         except Exception as e:
-            raise type(e)(e.message + ' happens at truncate_file in DataTypes.py')
+            raise type(e)(e.message + ' happened at truncate_file in PEType.py')
 
     # métodos públicos
     def get_offset_from_rva(self,rva):
         '''
-        Método para obtener el offset del archivo, 
-        según un RVA.
+        Method to get the file offset from a RVA.
 
         :param int rva: rva que buscar como offset
         :return: offset en el archivo físico.
@@ -167,15 +165,16 @@ class PE_File():
             offset = self.binary_.rva_to_offset(rva)
             return offset
         except Exception as e:
-            raise type(e)(e.message + ' happens at get_offset_from_rva in DataTypes.py')
+            raise type(e)(e.message + ' happens at get_offset_from_rva in PEType.py')
 
     def truncateOverHere(rva,size);
         '''
-        Método para truncar los archivos desde
-        un RVA, un valor dado.
+        Method to truncate file from an RVA, 
+        you can truncate everything from that RVA or
+        you can take optional size.
 
-        :param int rva: rva donde moverse en el archivo
-        :param int size (opcional): tamaño a truncar del archivo
+        :param int rva: rva to move in the file
+        :param int size (opcional): size to truncate file
         :return: None
         '''
         self._move_file_rva(rva,ORIGIN)
@@ -183,10 +182,9 @@ class PE_File():
 
     def getRVAEntryPoint(self):
         '''
-        Método para obtener el RVA de un EP de un PE
+        Method to get Entry Point RVA from PE Header
 
-        :return: valor de la cabecera Entry Point, 
-                 este será un RVA de su valor en memoria.
+        :return: Entry Point value from Optional header,
         '''
         op_header = self.binary_.optional_header
 
@@ -194,6 +192,8 @@ class PE_File():
 
     def setRVAEntryPoint(self,rva):
         '''
+        Method to set RVA Entry Point of that file.
+        We stop handle, 
         Método para establecer el RVA del archivo.
         Paramos el handle, y lo volvemos abrir, para 
         que se recargue en disco
@@ -379,7 +379,7 @@ class PE_File():
             original_size = x - rest
             self.setSizeOfCode(original_size)
         except Exception as e:
-            raise type(e)(e.message() + ' happens at alignSizeOfCode in DataTypes.py')
+            raise type(e)(e.message() + ' happened at alignSizeOfCode in PEType.py')
 
     def RVA_Seek(self,rva,seek_type):
         '''
